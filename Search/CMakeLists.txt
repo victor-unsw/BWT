@@ -4,4 +4,4 @@ project(Search)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES main.cpp)
-add_executable(Search ${SOURCE_FILES})
+add_executable(Search ${SOURCE_FILES} inc/preprocess.h src/preprocess.cpp inc/FBucket.h src/FBucket.cpp)
