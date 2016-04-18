@@ -50,6 +50,7 @@ public:
     }
 
     ~PreProcess(){
+        fin = NULL;
         delete [] buckets;
     }
 
@@ -66,14 +67,6 @@ public:
      */
     void index();
 
-    /*
-     * bot()
-     * - bot;
-     * - performs indexing if '.index' file
-     *   not present.
-     * - if present; then does as per logic.
-     */
-    void bot();
 
     //============================================================
     // Temporary Methods

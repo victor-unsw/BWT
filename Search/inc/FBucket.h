@@ -60,6 +60,13 @@ public:
         std::cout  << "]"<< std::endl;
     }
 
+    bool isEmpty(){
+        for (int i = 0; i < BUCKET_SIZE; ++i)
+            if (freq[i] != 0)
+                return false;
+        return true;
+    }
+
 };
 
 #endif //SEARCH_FREQUENCYBUCKET_H
