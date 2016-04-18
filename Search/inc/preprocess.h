@@ -12,13 +12,20 @@
 
 class PreProcess{
 
-private:
+    //============================================================
+    // Instance Variables
+    //============================================================
+
     std::ifstream*  fin;                                                                        // file input stream
     long long       FILE_SIZE;
     double          partition_limit;                                                            // data partition limit
     unsigned        total_partitions;                                                           // total partitions
     FBucket*        buckets;
     FBucket*        globalBucket;
+
+    //============================================================
+    // Utility methods
+    //============================================================
 
     /*
      * clone_bucket(..)
@@ -29,6 +36,9 @@ private:
 
 
 public:
+    //============================================================
+    // Constructor & Destructor
+    //============================================================
     PreProcess(std::ifstream* stream = NULL, unsigned MAX_SIZE = 25000):fin(stream),partition_limit(MAX_SIZE),globalBucket(new FBucket){
         std::streampos begin,end;
         begin       = fin->tellg();    fin->seekg(0,std::ios::end);
@@ -43,22 +53,69 @@ public:
         delete [] buckets;
     }
 
+
+
+    //============================================================
+    // Core Methods
+    //============================================================
+
+    /*
+     * index().
+     * - method to index the 'bwt file' and
+     *   write output to index file.
+     */
+    void index();
+
+    /*
+     * bot()
+     * - bot;
+     * - performs indexing if '.index' file
+     *   not present.
+     * - if present; then does as per logic.
+     */
+    void bot();
+
+    //============================================================
+    // Temporary Methods
+    //============================================================
+
     void info(){
-        std::cout << "FILE STREAM :-\nFILE SIZE\t["<<FILE_SIZE<<"]\n";
-        std::cout << "PARTITION SIZE\t["<<partition_limit<<"]\n";
-        std::cout << "TOTAL PARTITIONS\t["<<total_partitions<<"]\n";
+        std::cout << "\t\t-------------\n";
+        printf("%20s :: [%lli]\n","FILE SIZE",FILE_SIZE);
+        printf("%20s :: [%.0lf]\n","PARTITION SIZE",partition_limit);
+        printf("%20s :: [%d]\n","TOTAL PARTITIONS",total_partitions);
+        std::cout << "\t\t-------------\n";
     }
 
     void show_buckets(){
         for (int i = 0; i < total_partitions; ++i) {
-            std::cout << (i+1) << " : ";
+            std::cout << (i) << " : ";
             buckets[i].show();
         }
         std::cout << "Global :-\n";
         globalBucket->show();
     }
 
-    void index();
+    void partition(){
+        std::ofstream part("/Users/victorchoudhary/Documents/partition.txt");
+        fin->seekg(0,std::ios_base::beg);
+        int c = 0;      // character
+        int i = 0;      // flag
+        int p = 1;      // parition number
+
+        part << "PARTITION : " << p << std::endl;
+        while ((c = fin->get()) != EOF){
+            if (i == partition_limit){
+                part << "\nPARTITION : " << ++p << std::endl;
+                i = 0;
+            }
+            part.put(c);
+            i++;
+        }
+        if (fin->eof())
+            fin->clear();
+        fin->seekg(0,std::ios_base::beg);
+    }
 
 };
 

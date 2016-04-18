@@ -8,30 +8,48 @@
 #include <string.h>
 
 class FBucket{
-private:
-    int BUCKET_SIZE;
+public:
+    const int BUCKET_SIZE;
 
 public:
     int *  freq;
 
-    FBucket(int SIZE = 127):freq(new int[SIZE]){
-        BUCKET_SIZE = SIZE;
+    FBucket(int SIZE = 127):BUCKET_SIZE(SIZE),freq(new int[SIZE]){
         memset(freq,0,SIZE);
     }
     ~FBucket(){
-        delete [] freq;
+        delete[]freq;
     }
 
+    /*
+     * increment(c)
+     * - increments frequency of 'c' by 1.
+     */
     void increment(int c){
         freq[c]++;
     }
+
+    /*
+     * get(c).
+     * - returns frequency of character 'c'.
+     */
     int  get(int c){
         return freq[c];
     }
+
+    /*
+     * getSize().
+     * - returns size of the bucket.
+     */
     int getSize(){
         return BUCKET_SIZE;
     }
 
+    /*
+     * show().
+     * - display bucket.
+     * (temporary method)
+     */
     void show(){
         std::cout << "BUCKET [ ";
         for (int i = 0; i < BUCKET_SIZE; ++i) {
@@ -41,6 +59,7 @@ public:
         }
         std::cout  << "]"<< std::endl;
     }
+
 };
 
 #endif //SEARCH_FREQUENCYBUCKET_H
