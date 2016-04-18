@@ -13,7 +13,6 @@ void PreProcess::index(){
     unsigned currentPartition   = 0;
     FBucket*  bucket            = buckets+currentPartition;
 
-
     int c = 0;
     while ((c = fin->get()) != EOF){
         // start reading the file
@@ -22,6 +21,7 @@ void PreProcess::index(){
             partitionCount = 0;
             currentPartition++;
             bucket = buckets+currentPartition;
+            clone_bucket(buckets+(currentPartition-1),bucket);
         }
 
         bucket->freq[c]++;
@@ -29,7 +29,18 @@ void PreProcess::index(){
         partitionCount++;
         totalCount++;
     }
+    clone_bucket(bucket,globalBucket);
     t = (clock()-t);
 
     std::cout << "[index time] \t: ";printf("%-5.3f sec.\n",double(t)/CLOCKS_PER_SEC);
+}
+
+/*
+     * clone_bucket(..)
+     * - updates the 't' bucket with
+     *   frequency count from 'f' bucket.
+     */
+inline void PreProcess::clone_bucket(FBucket* const f,FBucket* const t){
+    for (int i = 0; i < f->getSize(); ++i)
+        t->freq[i] = f->freq[i];
 }

@@ -8,12 +8,13 @@
 #include <string.h>
 
 class FBucket{
+private:
     int BUCKET_SIZE;
+
 public:
     int *  freq;
 
-public:
-    FBucket(int SIZE = 126):freq(new int[SIZE]){
+    FBucket(int SIZE = 127):freq(new int[SIZE]){
         BUCKET_SIZE = SIZE;
         memset(freq,0,SIZE);
     }
@@ -26,6 +27,9 @@ public:
     }
     int  get(int c){
         return freq[c];
+    }
+    int getSize(){
+        return BUCKET_SIZE;
     }
 
     void show(){
