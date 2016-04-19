@@ -19,20 +19,17 @@ int main() {
 
     clock_t tt = clock();
 
-    ifstream fin(LARGE);
+    ifstream fin(DBLP);
 
 
 
     FidoSearch fido(&fin,8000);
     fido.showStats();
 
-    char c[] = "stat";
+    char c[] = "aa";
 
-    clock_t t = clock();
     fido.crunch(c);
-    t = clock() - t;
 
-    printf("%10s : %-5.5f sec.\n","[-n]",double(t)/CLOCKS_PER_SEC);
     fin.close();
     tt = clock() - tt;
     printf("\n\n%10s : %-5.5f sec.\n","[total time]",double(tt)/CLOCKS_PER_SEC);

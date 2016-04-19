@@ -10,6 +10,8 @@
 #include "FBucket.h"
 #include "fstream"
 #include "string"
+#include "vector"
+#include "algorithm"
 
 class FidoSearch{
 private:
@@ -18,11 +20,15 @@ private:
     std::ifstream   index;          // later to be merged into single buffer utility
     bool            INDEX_EXISTS;                                        // does index exists already; thus no need to do indexing
     FBucket         globalBucket;
+    FBucket         sortBucket;
 
     size_t          FILE_SIZE;
     double          PARTITION_SIZE;                                                             // data partition limit
     unsigned        TOTAL_PARTITIONS;                                                           // total partitions
     const std::string INDEX_FILE;
+
+    //long            total_partition_calls = 0;
+    //std::vector<int> PDstrb;
 
     //============================================================
     // CORE METHODS
@@ -57,6 +63,14 @@ private:
      */
     int BS(const std::string P);
 
+    /*
+     * decode(i).
+     * - core method.
+     * - decodes the bwt text from index
+     *   until '[' found.
+     */
+    void decode(unsigned index);
+
     //============================================================
     // UTILITY METHODS
     //============================================================
@@ -88,6 +102,8 @@ public:
         }
         index.open(INDEX_FILE);
         INDEX_EXISTS = index.is_open();
+        //PDstrb.reserve(TOTAL_PARTITIONS);
+        //PDstrb.assign(TOTAL_PARTITIONS,0);
     }
 
 

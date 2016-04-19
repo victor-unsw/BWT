@@ -17,12 +17,8 @@
  * - integer; i.e. total count of smaller characters.
  */
 unsigned FidoSearch::C(const char c) {
-    unsigned count = 0;
-    for (int i = 0; i < c; ++i)
-        count += globalBucket.freq[i];
-    return count;
+    return sortBucket.freq[c];
 }
-
 
 /*
  * Occ(c,q).
@@ -38,6 +34,8 @@ unsigned FidoSearch::C(const char c) {
 unsigned FidoSearch::Occ(const char c, const unsigned q) {
 
     int         current_partition   = int(q/PARTITION_SIZE);
+    //PDstrb[current_partition]++;
+    //total_partition_calls++;
     int         pre_partition       = current_partition - 1;
     unsigned    frequency           = 0;
     FBucket     tempBucket;
@@ -76,6 +74,7 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
  * - return -1 if no occurrance found.
  */
 int FidoSearch::BS(const std::string P) {
+    clock_t t = clock();
     size_t      loc     = P.size()-1;
     char        c       = P[loc];
     char        n       = nextAlive(c);                 // next character in global bucket
@@ -90,12 +89,54 @@ int FidoSearch::BS(const std::string P) {
         FIRST   = C(c) + Occ(c,FIRST-1);
         LAST    = C(c) + Occ(c,LAST) - 1;
     }
+
     if (FIRST > LAST)
         return -1;
 
-    printf("%10s : %u\n","[-n]",(LAST-FIRST+1));
+    int total_records = (LAST-FIRST+1);
+    t = clock() - t;
+    printf("%10s : %u\n","[-n]",total_records);
+    printf("%10s : %-5.5f sec.\n","[-n]",double(t)/CLOCKS_PER_SEC);
 
-    return 0;
+    for (int i = FIRST; i <= LAST; ++i)
+        decode(i);
+
+    return total_records;
+}
+
+
+/*
+ * decode(i).
+ * - core method.
+ * - decodes the bwt text from index
+ *   until '[' found.
+ */
+void FidoSearch::decode(unsigned index) {
+    char c = 0;
+    unsigned next = index;
+
+    std::string value;value.reserve(10);
+    bool fill = false;
+    while (c != '['){
+        fin->seekg(next,std::ios_base::beg);
+        c = fin->peek();
+
+        // temporary comparison
+        //int cp= int(next/PARTITION_SIZE);
+        //PDstrb[cp]++;
+        //total_partition_calls++;
+
+        if (fill && c != '[')
+            value.insert(value.begin(),c);
+
+        unsigned o = Occ(c,next);
+        unsigned u = C(c);
+
+        next = u + o - 1;
+
+        if (c == ']')
+            fill = true;
+    }
 }
 
 
@@ -105,6 +146,8 @@ int FidoSearch::BS(const std::string P) {
  *   pattern.
  */
 void FidoSearch::crunch(char* P) {
+    clock_t t = clock();
+
     if (!INDEX_EXISTS){
         indexer = new PreProcess(fin,PARTITION_SIZE);
         indexer->index();
@@ -123,12 +166,45 @@ void FidoSearch::crunch(char* P) {
     if (globalBucket.isEmpty()){
         std::cout << "Global bucket empty\n";
         exit(1);
+    } else{
+        // fill the sort bucket frequency
+        int size = sortBucket.getSize();
+        for (int i = 0,count = 0; i < size; ++i) {
+            if (globalBucket.freq[i] == 0)
+                continue;
+            sortBucket.freq[i] = count;
+            count += globalBucket.freq[i];
+        }
     }
 
     std::string pattern(P);
     int r = BS(pattern);
     if (r == -1)
         std::cout << "no pattern exist\n";
+
+    t = clock() - t;
+
+
+    printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
+
+/*    std::cout << "total partition calls : " << total_partition_calls << std::endl;
+    std::sort(PDstrb.begin(),PDstrb.end(),std::greater<int>());
+
+    int top_count = 0;
+    for (int i = 0; i < 1200; ++i) {
+        top_count += PDstrb[i];
+    }
+    std::cout << "top 1200 pages distribution : " << ((top_count/(total_partition_calls*1.0))*100) << " %" << std::endl;
+
+    int unique = 0;
+    for (auto it=PDstrb.begin();it!=PDstrb.end();it++) {
+        if (*it == 0)
+            break;
+        unique++;
+    }
+
+    std::cout << "total unique partition calls : " << unique << std::endl;*/
+
 }
 
 
@@ -158,7 +234,7 @@ inline void FidoSearch::fillBucket(FBucket *bucket, int partition) {
  */
 inline char FidoSearch::nextAlive(const char c) {
     for (int i = c+1; i < globalBucket.getSize(); ++i)
-        if (i != 0)
+        if (globalBucket.freq[i] != 0)
             return char(i);
     return 0;
 }
