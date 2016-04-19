@@ -21,8 +21,6 @@ void PreProcess::index(){
 
     unsigned totalCount         = 0;
     unsigned partitionCount     = 0;
-    unsigned currentPartition   = 0;
-    FBucket*  bucket            = buckets+currentPartition;
 
     int c = 0;
     while ((c = fin->get()) != EOF){
@@ -30,22 +28,17 @@ void PreProcess::index(){
 
         if (partitionCount >= partition_limit){
             // write the bucket data to index
-            // and assign new bucket
-            out.write((char*)bucket->freq,bucket->getSize()*sizeof(int));
-
+            out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
             partitionCount = 0;
-            currentPartition++;
-            bucket = buckets+currentPartition;
-            clone_bucket(buckets+(currentPartition-1),bucket);
         }
 
-        bucket->freq[c]++;
-
+        globalBucket->freq[c]++;
         partitionCount++;
         totalCount++;
     }
-    clone_bucket(bucket,globalBucket);
+
     out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
+
     t = (clock()-t);
     out.close();
     std::cout << "[index time] \t: ";printf("%-5.3f sec.\n",double(t)/CLOCKS_PER_SEC);

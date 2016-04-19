@@ -21,10 +21,12 @@ int main() {
 
     ifstream fin(LARGE);
 
+
+
     FidoSearch fido(&fin,8000);
     fido.showStats();
 
-    char c[] = "speech.";
+    char c[] = "stat";
 
     clock_t t = clock();
     fido.crunch(c);
