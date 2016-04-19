@@ -84,7 +84,7 @@ public:
             end         = fin->tellg();    fin->seekg(0,std::ios::beg);
             FILE_SIZE   = (size_t) (end-begin);
 
-            TOTAL_PARTITIONS = (unsigned)ceil(FILE_SIZE/MAX_SIZE);
+            TOTAL_PARTITIONS = (unsigned)ceil(FILE_SIZE/PARTITION_SIZE);
         }
         index.open(INDEX_FILE);
         INDEX_EXISTS = index.is_open();

@@ -20,7 +20,6 @@ unsigned FidoSearch::C(const char c) {
     unsigned count = 0;
     for (int i = 0; i < c; ++i)
         count += globalBucket.freq[i];
-    std::cout << "total count of " << char(c) << " : " << count << "\n";
     return count;
 }
 
@@ -30,32 +29,25 @@ unsigned FidoSearch::C(const char c) {
  * - core method
  * - finds number of occurance of char 'c' in prefix L[1,q]
  *
+ * c := character of which we need to find occurance
+ * q := exact index till which you wish to count.
+ *
  * RETURNS :-
  * - integer; i.e. total occurance of char 'c' in L[1,q].
  */
 unsigned FidoSearch::Occ(const char c, const unsigned q) {
-    clock_t time = clock();
+
     int         current_partition   = int(q/PARTITION_SIZE);
     int         pre_partition       = current_partition - 1;
     unsigned    frequency           = 0;
     FBucket     tempBucket;
-
-    bool  show = true;
-    if (show)
-    std::cout << "partition : " << current_partition << "\n";
 
     // fill bucket with pre partition frequencies
     if (pre_partition >= 0){
         // i.e. atleast 1 partition exists before current partition
         fillBucket(&tempBucket,pre_partition);
         frequency = (unsigned)tempBucket.freq[c];
-
-        if (show)
-        tempBucket.show();
     }
-
-    if (show)
-    std::cout << "Frequency : " << frequency << "\n";
 
     // do linear frequency count over current partition
     int start = int(current_partition * PARTITION_SIZE);                 // start position for read in 'bwt' file
@@ -63,20 +55,16 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
     if (fin->eof())
         fin->clear();
     fin->seekg(start, std::ios_base::beg);
+    int loop = (q - start)+1;
 
-    int limit = q - start;                                              // count only till limited characters
-    int i = 0,j = 0;
-    while ((i = fin->get()) != EOF && j < limit) {
+    for (int k = 0; k <loop; ++k) {
+        int i = fin->get();
+        if (i == EOF)
+            break;
         if (i == c)
             frequency++;
-        j++;
     }
 
-    if (show)
-    std::cout << "Frequency : " << frequency << "\n";
-
-    time = clock()-time;
-    //std::cout << "[Occ time] \t: ";printf("%-5.5f sec.\n",double(time)/CLOCKS_PER_SEC);
     return frequency;
 }
 
@@ -94,22 +82,17 @@ int FidoSearch::BS(const std::string P) {
     if (n == 0)
         return -1;
 
-    unsigned    FIRST   = C(c) + 1;
-    unsigned    LAST    = C(n);
-    std::cout << "char : " << char(c) << "\n";
-    std::cout << "F : " << FIRST << "\t L : " <<LAST << std::endl;
+    unsigned    FIRST   = C(c);
+    unsigned    LAST    = C(n) - 1;
 
     while ((FIRST <= LAST) && loc >= 1){
         c       = P[--loc];
-        std::cout << "char : " << char(c) << "\n";
-        FIRST   = C(c) + Occ(c,FIRST-1) + 1;
-        LAST    = C(c) + Occ(c,LAST);
-        std::cout << "F : " << FIRST << "\t L : " <<LAST << std::endl;
+        FIRST   = C(c) + Occ(c,FIRST-1);
+        LAST    = C(c) + Occ(c,LAST) - 1;
     }
     if (FIRST > LAST)
         return -1;
 
-    std::cout << "F : " << FIRST << "\t L : " <<LAST << std::endl;
     printf("%10s : %u\n","[-n]",(LAST-FIRST+1));
 
     return 0;
@@ -179,6 +162,7 @@ inline char FidoSearch::nextAlive(const char c) {
             return char(i);
     return 0;
 }
+
 
 void FidoSearch::showStats() {
     std::cout << "\n\t--------xxxxxxxxxxxxx--------\n";

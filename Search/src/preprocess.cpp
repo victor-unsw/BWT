@@ -30,6 +30,7 @@ void PreProcess::index(){
 
         if (partitionCount >= partition_limit){
             // write the bucket data to index
+            // and assign new bucket
             out.write((char*)bucket->freq,bucket->getSize()*sizeof(int));
 
             partitionCount = 0;
@@ -48,7 +49,6 @@ void PreProcess::index(){
     t = (clock()-t);
     out.close();
     std::cout << "[index time] \t: ";printf("%-5.3f sec.\n",double(t)/CLOCKS_PER_SEC);
-    //globalBucket->show();
 }
 
 
