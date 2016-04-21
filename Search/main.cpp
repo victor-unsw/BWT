@@ -19,14 +19,13 @@ int main() {
 
     clock_t tt = clock();
 
-    ifstream fin(DBLP);
-
+    ifstream fin(LARGE);
 
 
     FidoSearch fido(&fin,8000);
     fido.showStats();
 
-    char c[] = "aa";
+    char c[] = "Forschung";
 
     fido.crunch(c);
 

@@ -29,6 +29,7 @@ void PreProcess::index(){
         if (partitionCount >= partition_limit){
             // write the bucket data to index
             out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
+            //globalBucket->show();
             partitionCount = 0;
         }
 

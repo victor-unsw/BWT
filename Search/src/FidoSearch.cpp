@@ -2,6 +2,10 @@
 // Created by Demon on 19/04/16.
 //
 
+//
+//  ' we have to fix 'a' query from tiny.bwt
+
+
 #include "../inc/FidoSearch.h"
 //============================================================
 // CORE METHODS
@@ -16,7 +20,7 @@
  * RETURNS :-
  * - integer; i.e. total count of smaller characters.
  */
-unsigned FidoSearch::C(const char c) {
+inline unsigned FidoSearch::C(const char c) {
     return sortBucket.freq[c];
 }
 
@@ -34,38 +38,32 @@ unsigned FidoSearch::C(const char c) {
 unsigned FidoSearch::Occ(const char c, const unsigned q) {
 
     int         current_partition   = int(q/PARTITION_SIZE);
-    //PDstrb[current_partition]++;
-    //total_partition_calls++;
     int         pre_partition       = current_partition - 1;
     unsigned    frequency           = 0;
     FBucket     tempBucket;
 
     // fill bucket with pre partition frequencies
     if (pre_partition >= 0){
-        // i.e. atleast 1 partition exists before current partition
         fillBucket(&tempBucket,pre_partition);
         frequency = (unsigned)tempBucket.freq[c];
     }
 
+
     // do linear frequency count over current partition
-    int start = int(current_partition * PARTITION_SIZE);                 // start position for read in 'bwt' file
-
-    if (fin->eof())
-        fin->clear();
-    fin->seekg(start, std::ios_base::beg);
-    int loop = (q - start)+1;
-
-    for (int k = 0; k <loop; ++k) {
-        int i = fin->get();
-        if (i == EOF)
-            break;
-        if (i == c)
-            frequency++;
+    int         start   = int(current_partition * PARTITION_SIZE);                      // start position for read in 'bwt' file
+    const char* buffer  = pool->getBuffer(current_partition);                           // get buffer from pool
+    if (buffer == NULL){
+        std::cout << "no buffer received";
+        exit(1);
     }
+
+    int LIMIT = (q-start)+1;
+    for (int i = 0; i < LIMIT; ++i)
+        if (buffer[i] == c)
+            frequency++;
 
     return frequency;
 }
-
 
 /*
  * BS(P)
@@ -90,8 +88,9 @@ int FidoSearch::BS(const std::string P) {
         LAST    = C(c) + Occ(c,LAST) - 1;
     }
 
-    if (FIRST > LAST)
+    if (FIRST > LAST) {
         return -1;
+    }
 
     int total_records = (LAST-FIRST+1);
     t = clock() - t;
@@ -100,10 +99,8 @@ int FidoSearch::BS(const std::string P) {
 
     for (int i = FIRST; i <= LAST; ++i)
         decode(i);
-
     return total_records;
 }
-
 
 /*
  * decode(i).
@@ -115,30 +112,31 @@ void FidoSearch::decode(unsigned index) {
     char c = 0;
     unsigned next = index;
 
-    std::string value;value.reserve(10);
-    bool fill = false;
+    //std::string value;value.reserve(5000);
+    //bool fill = false;
     while (c != '['){
-        fin->seekg(next,std::ios_base::beg);
-        c = fin->peek();
+        int p = int(next/PARTITION_SIZE);                                               // partition of character we need
 
-        // temporary comparison
-        //int cp= int(next/PARTITION_SIZE);
-        //PDstrb[cp]++;
-        //total_partition_calls++;
+        int PSTART = int(p * PARTITION_SIZE);
+        int target = next - PSTART;
 
-        if (fill && c != '[')
-            value.insert(value.begin(),c);
+        const char * buffer = pool->getBuffer(p);
+        if (buffer == NULL){
+            std::cout << "no buffer received";
+            exit(1);
+        }
+        c = buffer[target];
+        //value.insert(value.begin(),c);
 
-        unsigned o = Occ(c,next);
+        unsigned o = Occ(c,next);                               // major time con
         unsigned u = C(c);
-
         next = u + o - 1;
 
-        if (c == ']')
-            fill = true;
+        //if (c == ']')
+        //    fill = true;
     }
+    //std::cout << "-> " << value << std::endl;
 }
-
 
 /*
  * crunch().
@@ -175,7 +173,7 @@ void FidoSearch::crunch(char* P) {
             sortBucket.freq[i] = count;
             count += globalBucket.freq[i];
         }
-    }
+    };
 
     std::string pattern(P);
     int r = BS(pattern);
@@ -184,27 +182,8 @@ void FidoSearch::crunch(char* P) {
 
     t = clock() - t;
 
-
     printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
-
-/*    std::cout << "total partition calls : " << total_partition_calls << std::endl;
-    std::sort(PDstrb.begin(),PDstrb.end(),std::greater<int>());
-
-    int top_count = 0;
-    for (int i = 0; i < 1200; ++i) {
-        top_count += PDstrb[i];
-    }
-    std::cout << "top 1200 pages distribution : " << ((top_count/(total_partition_calls*1.0))*100) << " %" << std::endl;
-
-    int unique = 0;
-    for (auto it=PDstrb.begin();it!=PDstrb.end();it++) {
-        if (*it == 0)
-            break;
-        unique++;
-    }
-
-    std::cout << "total unique partition calls : " << unique << std::endl;*/
-
+    pool->stats();
 }
 
 
@@ -247,4 +226,3 @@ void FidoSearch::showStats() {
     printf("%20s :: [%d]\n","TOTAL PARTITIONS",TOTAL_PARTITIONS);
     std::cout << "\t--------xxxxxxxxxxxxx--------\n\n";
 }
-

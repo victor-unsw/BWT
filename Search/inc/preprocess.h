@@ -38,7 +38,7 @@ public:
     //============================================================
     // Constructor & Destructor
     //============================================================
-    PreProcess(std::ifstream* stream = NULL, unsigned MAX_SIZE = 25000):fin(stream),partition_limit(MAX_SIZE),globalBucket(new FBucket){
+    PreProcess(std::ifstream* stream = NULL, unsigned MAX_SIZE = 8000):fin(stream),partition_limit(MAX_SIZE),globalBucket(new FBucket){
         std::streampos begin,end;
         begin       = fin->tellg();    fin->seekg(0,std::ios::end);
         end         = fin->tellg();    fin->seekg(0,std::ios::beg);

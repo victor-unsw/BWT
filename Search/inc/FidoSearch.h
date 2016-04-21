@@ -8,27 +8,28 @@
 #include "iostream"
 #include "preprocess.h"
 #include "FBucket.h"
+#include "cmath"
 #include "fstream"
 #include "string"
 #include "vector"
 #include "algorithm"
+#include "pool.h"
 
 class FidoSearch{
 private:
     PreProcess*     indexer;                                             // indexer object; initialized only when required
+    BPool*          pool;                                                // buffer pool
     std::ifstream*  fin;                                                 // file input stream
     std::ifstream   index;          // later to be merged into single buffer utility
     bool            INDEX_EXISTS;                                        // does index exists already; thus no need to do indexing
     FBucket         globalBucket;
     FBucket         sortBucket;
 
+    const long      MEMORY_CAP = 10*1000000;
     size_t          FILE_SIZE;
     double          PARTITION_SIZE;                                                             // data partition limit
     unsigned        TOTAL_PARTITIONS;                                                           // total partitions
     const std::string INDEX_FILE;
-
-    //long            total_partition_calls = 0;
-    //std::vector<int> PDstrb;
 
     //============================================================
     // CORE METHODS
@@ -43,7 +44,7 @@ private:
      * RETURNS :-
      * - integer; i.e. total count of smaller characters.
      */
-    unsigned C(const char c);
+    inline unsigned C(const char c);
 
     /*
      * Occ(c,q).
@@ -90,8 +91,18 @@ private:
     inline char nextAlive(const char c);
 
 public:
-    FidoSearch(std::ifstream* stream = NULL, const unsigned MAX_SIZE = 25000):indexer(NULL),fin(stream),FILE_SIZE(0),PARTITION_SIZE(MAX_SIZE),TOTAL_PARTITIONS(0),INDEX_EXISTS(
-            false),INDEX_FILE("/Users/victorchoudhary/Documents/output.txt"){
+    //============================================================
+    // CONSTRUCTOR & DESTRUCTOR
+    //============================================================
+    FidoSearch(std::ifstream* stream = NULL, const unsigned MAX_SIZE = 8000):indexer(NULL),
+                                                                             fin(stream),
+                                                                             FILE_SIZE(0),
+                                                                             PARTITION_SIZE(MAX_SIZE),
+                                                                             TOTAL_PARTITIONS(0),
+                                                                             INDEX_EXISTS(false),
+                                                                             INDEX_FILE("/Users/victorchoudhary/Documents/output.txt"),
+                                                                             pool(NULL)
+    {
         if (stream!=NULL){
             std::streampos begin,end;
             begin       = fin->tellg();    fin->seekg(0,std::ios::end);
@@ -102,8 +113,13 @@ public:
         }
         index.open(INDEX_FILE);
         INDEX_EXISTS = index.is_open();
-        //PDstrb.reserve(TOTAL_PARTITIONS);
-        //PDstrb.assign(TOTAL_PARTITIONS,0);
+
+        // create new buffer pool
+        pool = new BPool(fin,TOTAL_PARTITIONS,PARTITION_SIZE,MEMORY_CAP);
+    }
+
+    ~FidoSearch(){
+        delete pool;
     }
 
 
