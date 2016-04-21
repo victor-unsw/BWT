@@ -29,7 +29,7 @@ private:
     size_t          FILE_SIZE;
     double          PARTITION_SIZE;                                                             // data partition limit
     unsigned        TOTAL_PARTITIONS;                                                           // total partitions
-    const std::string INDEX_FILE;
+    const char*     INDEX_FILE;
 
     //============================================================
     // CORE METHODS
@@ -94,13 +94,13 @@ public:
     //============================================================
     // CONSTRUCTOR & DESTRUCTOR
     //============================================================
-    FidoSearch(std::ifstream* stream = NULL, const unsigned MAX_SIZE = 8000):indexer(NULL),
+    FidoSearch(std::ifstream* stream = NULL,const char* INDEX = NULL, const unsigned MAX_SIZE = 8000):indexer(NULL),
                                                                              fin(stream),
                                                                              FILE_SIZE(0),
                                                                              PARTITION_SIZE(MAX_SIZE),
                                                                              TOTAL_PARTITIONS(0),
                                                                              INDEX_EXISTS(false),
-                                                                             INDEX_FILE("/Users/victorchoudhary/Documents/output.txt"),
+                                                                             INDEX_FILE(INDEX),
                                                                              pool(NULL)
     {
         if (stream!=NULL){
@@ -132,7 +132,7 @@ public:
      * - core method to search & decode
      *   pattern.
      */
-    void crunch(char* P);
+    void crunch(const char* P);
 
 
     //============================================================

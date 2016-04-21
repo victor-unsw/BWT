@@ -143,11 +143,12 @@ void FidoSearch::decode(unsigned index) {
  * - core method to search & decode
  *   pattern.
  */
-void FidoSearch::crunch(char* P) {
+void FidoSearch::crunch(const char* P) {
     clock_t t = clock();
 
+    std::cout << "does exist : " << (INDEX_EXISTS?"yes":"no");
     if (!INDEX_EXISTS){
-        indexer = new PreProcess(fin,PARTITION_SIZE);
+        indexer = new PreProcess(fin,INDEX_FILE,PARTITION_SIZE);
         indexer->index();
         delete indexer;
         index.open(INDEX_FILE);

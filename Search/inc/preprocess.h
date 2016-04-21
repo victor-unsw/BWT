@@ -20,6 +20,7 @@ class PreProcess{
     long long       FILE_SIZE;
     double          partition_limit;                                                            // data partition limit
     unsigned        total_partitions;                                                           // total partitions
+    const char*     INDEX_FILE;
     FBucket*        globalBucket;
 
     //============================================================
@@ -38,7 +39,9 @@ public:
     //============================================================
     // Constructor & Destructor
     //============================================================
-    PreProcess(std::ifstream* stream = NULL, unsigned MAX_SIZE = 8000):fin(stream),partition_limit(MAX_SIZE),globalBucket(new FBucket){
+    PreProcess(std::ifstream* stream = NULL,const char* output = NULL,unsigned MAX_SIZE = 8000):fin(stream),
+                                                                       partition_limit(MAX_SIZE),
+                                                                       globalBucket(new FBucket),INDEX_FILE(output){
         std::streampos begin,end;
         begin       = fin->tellg();    fin->seekg(0,std::ios::end);
         end         = fin->tellg();    fin->seekg(0,std::ios::beg);

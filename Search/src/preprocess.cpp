@@ -17,7 +17,7 @@ void PreProcess::index(){
 
     clock_t t = clock();
 
-    std::ofstream out("/Users/victorchoudhary/Documents/output.txt",std::ios_base::out|std::ios_base::binary);
+    std::ofstream out(INDEX_FILE,std::ios_base::out|std::ios_base::binary);
 
     unsigned totalCount         = 0;
     unsigned partitionCount     = 0;

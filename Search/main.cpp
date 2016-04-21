@@ -15,19 +15,28 @@ const string OUTPUT= "/Users/victorchoudhary/Documents/output.txt";
 const string MISSI= "/Users/victorchoudhary/Documents/missi.txt";
 const string TEST= "/Users/victorchoudhary/Documents/test.txt";
 
-int main() {
+int main(int argc,char** argv) {
 
     clock_t tt = clock();
+    cout << "total : " << argc << endl;
+    ifstream            fin;
+    const char*         indexFile   = NULL;
+    const char*         search      = NULL;
+    if (argc >= 3){
+        fin.open(argv[1]);
+        indexFile   = argv[2];
+        search      = argv[3];
+    }else{
+        fin.open(LARGE);
+        indexFile   = "/Users/victorchoudhary/Documents/tt.txt";
+        search      = "apal";
+    }
 
-    ifstream fin(LARGE);
 
-
-    FidoSearch fido(&fin,8000);
+    FidoSearch fido(&fin,indexFile,8000);
     fido.showStats();
 
-    char c[] = "Forschung";
-
-    fido.crunch(c);
+    fido.crunch(search);
 
     fin.close();
     tt = clock() - tt;
