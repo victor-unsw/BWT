@@ -91,7 +91,7 @@ const char* BPool::getBuffer(int partition) {
         int nextVictim = -1;
         while ((nextVictim = victim(partition)) == -1)
             pivot += pivot;
-
+        cout << "releasing page : " << nextVictim << endl;
         releasePage(nextVictim);
         total_replacement++;
 

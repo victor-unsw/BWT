@@ -18,7 +18,7 @@ class Buffer{
 public:
     char*   b;                                      // buffer address
 
-    Buffer(int size = 8000):b(new char[size]){
+    Buffer(int size):b(new char[size]){
         memset((void*)b,0,size);
     }
 
