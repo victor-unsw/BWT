@@ -28,12 +28,12 @@ int main(int argc,char** argv) {
         search      = argv[3];
     }else{
         fin.open(LARGE);
-        indexFile   = "/Users/victorchoudhary/Documents/tt.txt";
-        search      = "apal";
+        indexFile   = "/Users/victorchoudhary/Documents/test/large.indx";
+        search      = "apa";
     }
 
 
-    FidoSearch fido(&fin,indexFile,8000);
+    FidoSearch fido(&fin,indexFile,4000);
     fido.showStats();
 
     fido.crunch(search);

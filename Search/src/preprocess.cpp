@@ -26,7 +26,7 @@ void PreProcess::index(){
     while ((c = fin->get()) != EOF){
         // start reading the file
 
-        if (partitionCount >= partition_limit){
+        if (partitionCount >= PARTITION_SIZE){
             // write the bucket data to index
             out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
             //globalBucket->show();
@@ -43,19 +43,4 @@ void PreProcess::index(){
     t = (clock()-t);
     out.close();
     std::cout << "[index time] \t: ";printf("%-5.3f sec.\n",double(t)/CLOCKS_PER_SEC);
-}
-
-
-//============================================================
-// Utility methods
-//============================================================
-
-/*
-     * clone_bucket(..)
-     * - updates the 't' bucket with
-     *   frequency count from 'f' bucket.
-     */
-inline void PreProcess::clone_bucket(FBucket* const f,FBucket* const t){
-    for (int i = 0; i < f->getSize(); ++i)
-        t->freq[i] = f->freq[i];
 }

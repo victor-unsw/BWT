@@ -18,7 +18,7 @@ class PreProcess{
 
     std::ifstream*  fin;                                                                        // file input stream
     long long       FILE_SIZE;
-    double          partition_limit;                                                            // data partition limit
+    double          PARTITION_SIZE;                                                            // data partition limit
     unsigned        total_partitions;                                                           // total partitions
     const char*     INDEX_FILE;
     FBucket*        globalBucket;
@@ -27,28 +27,15 @@ class PreProcess{
     // Utility methods
     //============================================================
 
-    /*
-     * clone_bucket(..)
-     * - updates the 't' bucket with
-     *   frequency count from 'f' bucket.
-     */
-    inline void clone_bucket(FBucket* f,FBucket* t);
-
-
 public:
     //============================================================
     // Constructor & Destructor
     //============================================================
-    PreProcess(std::ifstream* stream = NULL,const char* output = NULL,unsigned MAX_SIZE = 8000):fin(stream),
-                                                                       partition_limit(MAX_SIZE),
-                                                                       globalBucket(new FBucket),INDEX_FILE(output){
-        std::streampos begin,end;
-        begin       = fin->tellg();    fin->seekg(0,std::ios::end);
-        end         = fin->tellg();    fin->seekg(0,std::ios::beg);
-        FILE_SIZE   = end-begin;
-
-        total_partitions = (unsigned)ceil(FILE_SIZE/partition_limit);
-    }
+    PreProcess(std::ifstream* stream,const char* output,int F_SIZE,unsigned P_SIZE, unsigned T_PARTITIONS):fin(stream),
+                                                                                                             FILE_SIZE(F_SIZE),
+                                                                                                             PARTITION_SIZE(P_SIZE),
+                                                                                                             globalBucket(new FBucket),
+                                                                                                             INDEX_FILE(output),total_partitions(T_PARTITIONS){}
 
     ~PreProcess(){
         fin = NULL;
@@ -82,7 +69,7 @@ public:
 
         part << "PARTITION : " << p << std::endl;
         while ((c = fin->get()) != EOF){
-            if (i == partition_limit){
+            if (i == PARTITION_SIZE){
                 part << "\nPARTITION : " << ++p << std::endl;
                 i = 0;
             }

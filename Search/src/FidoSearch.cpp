@@ -51,7 +51,11 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
 
     // do linear frequency count over current partition
     int         start   = int(current_partition * PARTITION_SIZE);                      // start position for read in 'bwt' file
+
+    //std::cout << "went to pool : OCC\n";
     const char* buffer  = pool->getBuffer(current_partition);                           // get buffer from pool
+    //std::cout << "came back from pool : OCC\n";
+
     if (buffer == NULL){
         std::cout << "no buffer received";
         exit(1);
@@ -97,8 +101,10 @@ int FidoSearch::BS(const std::string P) {
     printf("%10s : %u\n","[-n]",total_records);
     printf("%10s : %-5.5f sec.\n","[-n]",double(t)/CLOCKS_PER_SEC);
 
-    for (int i = FIRST; i <= LAST; ++i)
+    for (int i = FIRST,j=1; i <= LAST; ++i,j++) {
         decode(i);
+        //std::cout << "done " << j << "\n";
+    }
     return total_records;
 }
 
@@ -120,7 +126,10 @@ void FidoSearch::decode(unsigned index) {
         int PSTART = int(p * PARTITION_SIZE);
         int target = next - PSTART;
 
+        //std::cout << "went to pool : Decode\n";
         const char * buffer = pool->getBuffer(p);
+        //std::cout << "came back from pool : Decode\n";
+
         if (buffer == NULL){
             std::cout << "no buffer received";
             exit(1);
@@ -146,9 +155,8 @@ void FidoSearch::decode(unsigned index) {
 void FidoSearch::crunch(const char* P) {
     clock_t t = clock();
 
-    std::cout << "does exist : " << (INDEX_EXISTS?"yes":"no");
     if (!INDEX_EXISTS){
-        indexer = new PreProcess(fin,INDEX_FILE,PARTITION_SIZE);
+        indexer = new PreProcess(fin,INDEX_FILE,FILE_SIZE,PARTITION_SIZE,TOTAL_PARTITIONS);
         indexer->index();
         delete indexer;
         index.open(INDEX_FILE);
@@ -223,7 +231,7 @@ inline char FidoSearch::nextAlive(const char c) {
 void FidoSearch::showStats() {
     std::cout << "\n\t--------xxxxxxxxxxxxx--------\n";
     printf("%20s :: [%lu]\n","FILE SIZE",FILE_SIZE);
-    printf("%20s :: [%.0lf]\n","PARTITION SIZE",PARTITION_SIZE);
+    printf("%20s :: [%d]\n","PARTITION SIZE",PARTITION_SIZE);
     printf("%20s :: [%d]\n","TOTAL PARTITIONS",TOTAL_PARTITIONS);
     std::cout << "\t--------xxxxxxxxxxxxx--------\n\n";
 }

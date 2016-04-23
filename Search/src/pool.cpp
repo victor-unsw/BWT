@@ -21,13 +21,13 @@
 inline bool BPool::getPage(int partition) {
     pool[partition]     = new Buffer(BUFFER_SIZE);
 
-    int START = partition * PARTITION_SIZE;
+    int START = partition * BUFFER_SIZE;
 
     if (fin->eof())
         fin->clear();
 
     fin->seekg(START,std::ios_base::beg);
-    fin->read((char*)pool[partition]->b,PARTITION_SIZE);
+    fin->read(pool[partition]->b,BUFFER_SIZE);
 
     return true;
 }
@@ -38,8 +38,8 @@ inline bool BPool::getPage(int partition) {
  *   from the pool.
  */
 inline void BPool::releasePage(int partition) {
-    Buffer* temp = pool[partition];
-    delete temp;
+    //Buffer* temp = pool[partition];
+    delete pool[partition];
     pool[partition] = NULL;
 }
 
@@ -75,22 +75,21 @@ const char* BPool::getBuffer(int partition) {
     updateMax(partition);
 
     if (pool[partition] != NULL){
-        // if partition already in memory
-        // return its position
         total_safe++;
         return pool[partition]->b;
     }
 
-    // if buffer doesn't exist in memory
-    // and pool is full
+    // if buffer doesn't exist in memory and pool is full
     if (SIZE >= CAPACITY){
         // release a low popular page
+        //std::cout << "searching next victim :-" << "\n";
         int nextVictim = -1;
         while ((nextVictim = victim(partition)) == -1){
             pivot += pivot;
         }
         releasePage(nextVictim);
         total_replacement++;
+        //std::cout << "got victim :- " << nextVictim << "\n";
         SIZE--;
     }
 
@@ -100,7 +99,7 @@ const char* BPool::getBuffer(int partition) {
     SIZE++;
     if (pool[partition] != NULL)
         return pool[partition]->b;
-
+    std::cout << "returning null\n";
     return NULL;
 }
 

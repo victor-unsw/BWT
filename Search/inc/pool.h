@@ -14,10 +14,8 @@ class Buffer{
 
 public:
     char*   b;                                      // buffer address
-    int     p;                                      // partition number
-    int     c;                                      // popularity count
 
-    Buffer(int size = 8000, unsigned partition = 0):b(new char[size]),p(partition),c(0){
+    Buffer(int size = 8000):b(new char[size]){
         memset((void*)b,0,size);
     }
 
@@ -34,7 +32,6 @@ private:
     unsigned        POOL_SIZE;
     const unsigned  MEMORY_CAP;
     const unsigned  CAPACITY;
-    const unsigned  PARTITION_SIZE;
     const unsigned  TOTAL_PARTITIONS;
 
     Buffer      **  pool;                                               // buffer pool ( as hashmap, load = 1)
@@ -71,14 +68,6 @@ private:
     inline void releasePage(int partition);
 
     /*
-     * updateMax(p).
-     * - update the max_popular if 'p'
-     *   partition is more popular.
-     * - update pivot value.
-     */
-    inline void updateMax(int partition);
-
-    /*
      * victim(p).
      * - starts from partition 'p' index
      *   and finds next unpopular page.
@@ -92,13 +81,12 @@ private:
     //============================================================
 
     /*
-     * updatePopularity.
-     * - updates pivot at every call to
-     *   getPartition.
-     *
-     * pivot = ( max_popular / total_attempt)*100;
+     * updateMax(p).
+     * - update the max_popular if 'p'
+     *   partition is more popular.
+     * - update pivot value.
      */
-    inline void updatePivot();
+    inline void updateMax(int partition);
 
 public:
     //============================================================
@@ -109,21 +97,20 @@ public:
      * default memory cap       := 1,00,0000 bytes a.k.a 10 MB.
      *
      */
-    BPool(std::ifstream* stream = NULL,const unsigned TOTAL_P = 0,const unsigned PSize = 8000,const unsigned CAP = 10000000):PARTITION_SIZE(PSize),
-                                                                                                                             fin(stream),
-                                                                                                                             MEMORY_CAP(CAP),
-                                                                                                                             CAPACITY(CAP/PSize),
-                                                                                                                             BUFFER_SIZE(PSize),
-                                                                                                                             POOL_SIZE(0),
-                                                                                                                             TOTAL_PARTITIONS(TOTAL_P),
-                                                                                                                             pool(NULL),
-                                                                                                                             popularity(NULL),
-                                                                                                                             pivot(0),
-                                                                                                                             max_popular(0),
-                                                                                                                             total_access(0),
-                                                                                                                             total_attempt(0),
-                                                                                                                             total_replacement(0),
-                                                                                                                             SIZE(0) {
+    BPool(std::ifstream* stream,const unsigned PSize,const unsigned TOTAL_P,const unsigned CAP):BUFFER_SIZE(PSize),
+                                                                                                fin(stream),
+                                                                                                MEMORY_CAP(CAP),
+                                                                                                TOTAL_PARTITIONS(TOTAL_P),
+                                                                                                CAPACITY(CAP/PSize),
+                                                                                                POOL_SIZE(0),
+                                                                                                pool(NULL),
+                                                                                                popularity(NULL),
+                                                                                                pivot(0),
+                                                                                                max_popular(0),
+                                                                                                total_access(0),
+                                                                                                total_attempt(0),
+                                                                                                total_replacement(0),
+                                                                                                SIZE(0) {
         POOL_SIZE = CAPACITY*BUFFER_SIZE;
 
         // initialize the buffer pool as null
