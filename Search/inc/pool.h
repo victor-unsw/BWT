@@ -9,6 +9,7 @@
 #include "iostream"
 #include "cmath"
 #include "cstring"
+#include "string.h"
 #include "fstream"
 #include "iostream"
 using namespace std;

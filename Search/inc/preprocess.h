@@ -8,6 +8,7 @@
 #include "fstream"
 #include "iostream"
 #include "cstring"
+#include "string.h"
 #include "FBucket.h"
 #include "cmath"
 
