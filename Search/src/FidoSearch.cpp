@@ -52,7 +52,7 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
     // do linear frequency count over current partition
     int         start   = int(current_partition * PARTITION_SIZE);                      // start position for read in 'bwt' file
 
-    //std::cout << "went to pool : OCC\n";
+    //std::cout << "went to pool : OCC: " << current_partition <<"\n";
     const char* buffer  = pool->getBuffer(current_partition);                           // get buffer from pool
     //std::cout << "came back from pool : OCC\n";
 
@@ -95,7 +95,6 @@ int FidoSearch::BS(const std::string P) {
     if (FIRST > LAST) {
         return -1;
     }
-
     int total_records = (LAST-FIRST+1);
     t = clock() - t;
     printf("%10s : %u\n","[-n]",total_records);
@@ -103,7 +102,6 @@ int FidoSearch::BS(const std::string P) {
 
     for (int i = FIRST,j=1; i <= LAST; ++i,j++) {
         decode(i);
-        //std::cout << "done " << j << "\n";
     }
     return total_records;
 }
@@ -126,7 +124,7 @@ void FidoSearch::decode(unsigned index) {
         int PSTART = int(p * PARTITION_SIZE);
         int target = next - PSTART;
 
-        //std::cout << "went to pool : Decode\n";
+        //std::cout << "went to pool : Decode : " << p <<"\n";
         const char * buffer = pool->getBuffer(p);
         //std::cout << "came back from pool : Decode\n";
 

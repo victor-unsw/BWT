@@ -25,7 +25,7 @@ private:
     FBucket         globalBucket;
     FBucket         sortBucket;
 
-    const long      MEMORY_CAP = 10*1000000;
+    const long      MEMORY_CAP;
     size_t          FILE_SIZE;
     unsigned        PARTITION_SIZE;                                                             // data partition limit
     unsigned        TOTAL_PARTITIONS;                                                           // total partitions
@@ -94,13 +94,13 @@ public:
     //============================================================
     // CONSTRUCTOR & DESTRUCTOR
     //============================================================
-    FidoSearch(std::ifstream* stream,const char* INDEX, const unsigned MAX_SIZE):indexer(NULL),
+    FidoSearch(std::ifstream* stream,const char* INDEX, const unsigned MAX_SIZE, unsigned CAP):indexer(NULL),
                                                                                 fin(stream),
                                                                                 FILE_SIZE(0),
                                                                                 PARTITION_SIZE(MAX_SIZE),
                                                                                 TOTAL_PARTITIONS(0),
                                                                                 INDEX_EXISTS(false),
-                                                                                INDEX_FILE(INDEX),
+                                                                                INDEX_FILE(INDEX),MEMORY_CAP(CAP),
                                                                                 pool(NULL)
     {
         if (stream == NULL) {

@@ -22,18 +22,24 @@ int main(int argc,char** argv) {
     ifstream            fin;
     const char*         indexFile   = NULL;
     const char*         search      = NULL;
-    if (argc >= 3){
+    int                 buffer      = 0;
+    int                 cap         = 0;
+
+    if (argc >= 5){
         fin.open(argv[1]);
         indexFile   = argv[2];
         search      = argv[3];
+        buffer      = atoi(argv[4]);
+        cap         = atoi(argv[5]);
     }else{
-        fin.open(LARGE);
-        indexFile   = "/Users/victorchoudhary/Documents/test/large.indx";
-        search      = "apa";
+        fin.open(TINY);
+        indexFile   = "/Users/victorchoudhary/Documents/test/tiny.indx";
+        search      = "a";
+        buffer      = 10;
+        cap         = 100;
     }
 
-
-    FidoSearch fido(&fin,indexFile,4000);
+    FidoSearch fido(&fin,indexFile,buffer,cap);
     fido.showStats();
 
     fido.crunch(search);

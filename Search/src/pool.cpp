@@ -52,13 +52,16 @@ inline void BPool::releasePage(int partition) {
  */
 inline int BPool::victim(int p) {
     bool    found = false;
-    for (int i = 0, j = p+1; i < TOTAL_PARTITIONS; ++i,++j) {
+    int j = p+1 >= TOTAL_PARTITIONS ? 0 : p+1;
+
+    for (int i = 0; i < TOTAL_PARTITIONS-1; ++i,++j) {
 
         if (pool[j] != NULL && popularity[j] < pivot)
             return j;
         if (j+1 == TOTAL_PARTITIONS)        // ring access
             j = -1;
     }
+
     return -1;
 }
 
@@ -70,26 +73,28 @@ inline int BPool::victim(int p) {
  *
  */
 const char* BPool::getBuffer(int partition) {
+    //cout << "getting p : " << partition << endl;
     total_attempt++;                                                // attempt to access a partition
     popularity[partition]++;
     updateMax(partition);
 
     if (pool[partition] != NULL){
         total_safe++;
+        //cout << partition << " already there\n";
         return pool[partition]->b;
     }
 
     // if buffer doesn't exist in memory and pool is full
     if (SIZE >= CAPACITY){
-        // release a low popular page
-        //std::cout << "searching next victim :-" << "\n";
+        //cout << partition << " needs replacement \n";
+
         int nextVictim = -1;
-        while ((nextVictim = victim(partition)) == -1){
+        while ((nextVictim = victim(partition)) == -1)
             pivot += pivot;
-        }
+
         releasePage(nextVictim);
         total_replacement++;
-        //std::cout << "got victim :- " << nextVictim << "\n";
+
         SIZE--;
     }
 
@@ -97,6 +102,7 @@ const char* BPool::getBuffer(int partition) {
     getPage(partition);
     total_access++;
     SIZE++;
+    //cout << "sending p : " << partition << endl;
     if (pool[partition] != NULL)
         return pool[partition]->b;
     std::cout << "returning null\n";

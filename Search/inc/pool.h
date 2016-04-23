@@ -6,10 +6,11 @@
 #define SEARCH_POOL_H
 
 #include "algorithm"
+#include "iostream"
 #include "cmath"
 #include "fstream"
 #include "iostream"
-
+using namespace std;
 class Buffer{
 
 public:
@@ -29,7 +30,6 @@ class BPool{
 private:
     std::ifstream*  fin;                                                 // file input stream
     const unsigned  BUFFER_SIZE;
-    unsigned        POOL_SIZE;
     const unsigned  MEMORY_CAP;
     const unsigned  CAPACITY;
     const unsigned  TOTAL_PARTITIONS;
@@ -102,7 +102,6 @@ public:
                                                                                                 MEMORY_CAP(CAP),
                                                                                                 TOTAL_PARTITIONS(TOTAL_P),
                                                                                                 CAPACITY(CAP/PSize),
-                                                                                                POOL_SIZE(0),
                                                                                                 pool(NULL),
                                                                                                 popularity(NULL),
                                                                                                 pivot(0),
@@ -111,8 +110,7 @@ public:
                                                                                                 total_attempt(0),
                                                                                                 total_replacement(0),
                                                                                                 SIZE(0) {
-        POOL_SIZE = CAPACITY*BUFFER_SIZE;
-
+        //cout << "building pool for " << TOTAL_PARTITIONS << " buffers\n";
         // initialize the buffer pool as null
         pool    = new Buffer*[TOTAL_PARTITIONS];
         for (int i = 0; i < TOTAL_PARTITIONS; ++i)
