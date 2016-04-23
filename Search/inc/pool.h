@@ -8,6 +8,7 @@
 #include "algorithm"
 #include "iostream"
 #include "cmath"
+#include "cstring"
 #include "fstream"
 #include "iostream"
 using namespace std;
