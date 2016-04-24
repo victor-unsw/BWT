@@ -12,30 +12,15 @@ public:
     const int BUCKET_SIZE;
 
 public:
-    int *  freq;
+    unsigned *  freq;
 
-    FBucket(int SIZE = 127):BUCKET_SIZE(SIZE),freq(new int[SIZE]){
+    FBucket(int SIZE = 127):BUCKET_SIZE(SIZE),freq(new unsigned[SIZE]){
         memset(freq,0,SIZE);
     }
     ~FBucket(){
         delete[]freq;
     }
 
-    /*
-     * increment(c)
-     * - increments frequency of 'c' by 1.
-     */
-    void increment(int c){
-        freq[c]++;
-    }
-
-    /*
-     * get(c).
-     * - returns frequency of character 'c'.
-     */
-    int  get(int c){
-        return freq[c];
-    }
 
     /*
      * getSize().

@@ -20,7 +20,7 @@ class PreProcess{
 
     std::ifstream*  fin;                                                                        // file input stream
     long long       FILE_SIZE;
-    double          PARTITION_SIZE;                                                            // data partition limit
+    unsigned        PARTITION_SIZE;                                                            // data partition limit
     unsigned        total_partitions;                                                           // total partitions
     const char*     INDEX_FILE;
     FBucket*        globalBucket;

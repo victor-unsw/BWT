@@ -73,7 +73,7 @@ inline int BPool::victim(int p) {
  *
  */
 const char* BPool::getBuffer(int partition) {
-    //cout << "getting p : " << partition << endl;
+    //cout << "getting partition : " << partition << endl;cin.get();
     total_attempt++;                                                // attempt to access a partition
     popularity[partition]++;
     updateMax(partition);
@@ -91,10 +91,8 @@ const char* BPool::getBuffer(int partition) {
         int nextVictim = -1;
         while ((nextVictim = victim(partition)) == -1)
             pivot += pivot;
-        cout << "releasing page : " << nextVictim << endl;
         releasePage(nextVictim);
         total_replacement++;
-
         SIZE--;
     }
 
@@ -105,7 +103,7 @@ const char* BPool::getBuffer(int partition) {
     //cout << "sending p : " << partition << endl;
     if (pool[partition] != NULL)
         return pool[partition]->b;
-    std::cout << "returning null\n";
+    //std::cout << "returning null\n";
     return NULL;
 }
 
