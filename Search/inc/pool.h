@@ -37,7 +37,7 @@ private:
     const unsigned  TOTAL_PARTITIONS;
 
     Buffer      **  pool;                                               // buffer pool ( as hashmap, load = 1)
-    unsigned    *   popularity;                                         // popularity of each buffer
+    uintptr_t   *   popularity;                                         // popularity of each buffer
     int             pivot;                                              // popularity pivot
 
     unsigned        SIZE;                                               // total buffer's in pool.
@@ -119,7 +119,7 @@ public:
             pool[i] = NULL;
 
         // initialize popularity index as 0
-        popularity = new unsigned[TOTAL_PARTITIONS];
+        popularity = new uintptr_t[TOTAL_PARTITIONS];
         for (int j = 0; j < TOTAL_PARTITIONS; ++j)
             popularity[j] = 0;
     }
