@@ -51,7 +51,16 @@ inline void BPool::releasePage(int partition) {
  * - return -1 if no such index exist.
  */
 inline int BPool::victim(int p) {
-
+    int current = int(ceil(active.size()/2));
+    int j = current == active.size() ? 0 : current;
+    for (int i = 0; i < active.size(); ++i) {
+        if (popularity[active[j]] < pivot){
+            int temp = active[j];active[j]  = p;
+            return temp;
+        }
+        if (j == active.size())
+            j = 0;
+    }/*
     for (auto it=active.begin();it != active.end();it++) {
         if (popularity[*it] < pivot)
         {
@@ -59,7 +68,7 @@ inline int BPool::victim(int p) {
             *it = p;
             return temp;
         }
-    }
+    }*/
     return -1;
 }
 

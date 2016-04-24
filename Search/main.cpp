@@ -32,9 +32,9 @@ int main(int argc,char** argv) {
         buffer      = atoi(argv[4]);
         cap         = atoi(argv[5]);
     }else{
-        fin.open(LARGE);
-        indexFile   = "/Users/victorchoudhary/Documents/test/large.indx";
-        search      = "aa";
+        fin.open(DBLP);
+        indexFile   = "/Users/victorchoudhary/Documents/test/dblp.indx";
+        search      = "eme";
         buffer      = 4000;
         cap         = 10000000;
     }

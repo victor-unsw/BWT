@@ -162,6 +162,7 @@ public:
         printf("%20s :: [%d]\n","TOTAL ACCESS",total_access);
         printf("%20s :: [%d]\n","TOTAL REPLACEMENT",total_replacement);
         printf("%20s :: [%d]\n","TOTAL SAFE",total_safe);
+        printf("%20s :: [%d]\n","ACTIVE",active.size());
         std::cout << "\t--------xxxxxxBUFFERxxxxxxx--------\n\n";
     }
 
