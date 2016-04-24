@@ -32,11 +32,11 @@ int main(int argc,char** argv) {
         buffer      = atoi(argv[4]);
         cap         = atoi(argv[5]);
     }else{
-        fin.open(TINY);
-        indexFile   = "/Users/victorchoudhary/Documents/test/tiny.indx";
-        search      = "a";
-        buffer      = 10;
-        cap         = 100;
+        fin.open(LARGE);
+        indexFile   = "/Users/victorchoudhary/Documents/test/large.indx";
+        search      = "aa";
+        buffer      = 4000;
+        cap         = 10000000;
     }
 
     FidoSearch fido(&fin,indexFile,buffer,cap);

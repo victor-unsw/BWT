@@ -11,6 +11,7 @@
 #include "cstring"
 #include "string.h"
 #include "fstream"
+#include "vector"
 #include "iostream"
 using namespace std;
 class Buffer{
@@ -38,6 +39,7 @@ private:
 
     Buffer      **  pool;                                               // buffer pool ( as hashmap, load = 1)
     uintptr_t   *   popularity;                                         // popularity of each buffer
+    std::vector<int>active;                                             // active candidates
     int             pivot;                                              // popularity pivot
 
     unsigned        SIZE;                                               // total buffer's in pool.
@@ -122,6 +124,9 @@ public:
         popularity = new uintptr_t[TOTAL_PARTITIONS];
         for (int j = 0; j < TOTAL_PARTITIONS; ++j)
             popularity[j] = 0;
+
+        active.reserve(CAPACITY);
+        std::cout<<"size right now : " << active.size() << "\n";
     }
 
     ~BPool(){

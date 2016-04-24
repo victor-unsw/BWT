@@ -51,17 +51,15 @@ inline void BPool::releasePage(int partition) {
  * - return -1 if no such index exist.
  */
 inline int BPool::victim(int p) {
-    bool    found = false;
-    int j = p+1 >= TOTAL_PARTITIONS ? 0 : p+1;
 
-    for (int i = 0; i < TOTAL_PARTITIONS-1; ++i,++j) {
-
-        if (pool[j] != NULL && popularity[j] < pivot)
-            return j;
-        if (j+1 == TOTAL_PARTITIONS)        // ring access
-            j = -1;
+    for (auto it=active.begin();it != active.end();it++) {
+        if (popularity[*it] < pivot)
+        {
+            int temp = *it;
+            *it = p;
+            return temp;
+        }
     }
-
     return -1;
 }
 
@@ -94,7 +92,8 @@ const char* BPool::getBuffer(int partition) {
         releasePage(nextVictim);
         total_replacement++;
         SIZE--;
-    }
+    } else
+        active.push_back(partition);
 
     // fill the required buffer with data
     getPage(partition);
