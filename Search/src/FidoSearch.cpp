@@ -182,7 +182,7 @@ void FidoSearch::crunch(const char* P) {
             sortBucket.freq[i] = count;
             count += globalBucket.freq[i];
         }
-    };
+    }
 
     std::string pattern(P);
     int r = BS(pattern);

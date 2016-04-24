@@ -14,8 +14,9 @@ public:
 public:
     unsigned *  freq;
 
+
     FBucket(int SIZE = 127):BUCKET_SIZE(SIZE),freq(new unsigned[SIZE]){
-        memset(freq,0,SIZE);
+        memset(freq,0,SIZE* sizeof(unsigned));
     }
     ~FBucket(){
         delete[]freq;
