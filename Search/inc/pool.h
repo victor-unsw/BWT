@@ -124,7 +124,6 @@ public:
             popularity[j] = 0;
 
         active.reserve(CAPACITY);
-        std::cout<<"size right now : " << active.size() << "\n";
     }
 
     ~BPool(){

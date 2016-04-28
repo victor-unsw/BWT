@@ -5,8 +5,15 @@
 //
 //  ' we have to fix 'a' query from tiny.bwt
 
+#include <iostream>
+#include <cstring>
+#include <fstream>
 
+#include "../inc/preprocess.h"
 #include "../inc/FidoSearch.h"
+
+using namespace std;
+
 //============================================================
 // CORE METHODS
 //============================================================
@@ -76,7 +83,7 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
  * - return -1 if no occurrance found.
  */
 int FidoSearch::BS(const std::string P) {
-    clock_t t = clock();
+
     size_t      loc     = P.size()-1;
     char        c       = P[loc];
     char        n       = nextAlive(c);                 // next character in global bucket
@@ -99,14 +106,12 @@ int FidoSearch::BS(const std::string P) {
         return -1;
     }
     int total_records = (LAST-FIRST+1);
-    t = clock() - t;
-    printf("%10s : %u\n","[-n]",total_records);
-    printf("%10s : %-5.5f sec.\n","[-n]",double(t)/CLOCKS_PER_SEC);
 
-
-    for (unsigned i = FIRST,j=1; i <= LAST; ++i,j++) {
-        decode(i);
+    if (OBJECTIVE == R || OBJECTIVE == A) {
+        for (unsigned i = FIRST, j = 1; i <= LAST; ++i, j++)
+            decode(i);
     }
+
     return total_records;
 }
 
@@ -146,7 +151,7 @@ void FidoSearch::decode(unsigned index) {
         if (c == ']')
             fill = true;
     }
-    std::cout << "-> " << value << std::endl;
+    //std::cout << "-> " << value << std::endl;
 }
 
 
@@ -158,7 +163,6 @@ void FidoSearch::decode(unsigned index) {
  */
 void FidoSearch::crunch(const char* P) {
     clock_t t = clock();
-
     if (!INDEX_EXISTS){
         indexer = new PreProcess(fin,INDEX_FILE,FILE_SIZE,PARTITION_SIZE,TOTAL_PARTITIONS);
         indexer->index();
@@ -192,13 +196,16 @@ void FidoSearch::crunch(const char* P) {
 
     std::string pattern(P);
     int r = BS(pattern);
-    if (r == -1)
-        std::cout << "no pattern exist\n";
-
+    if (r == -1) {
+        std::cout << "WARNING [no pattern exist]\n";
+        exit(1);
+    }else{
+        cout << r << endl;
+    }
     t = clock() - t;
 
-    printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
-    pool->stats();
+    //printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
+    //pool->stats();
 }
 
 
@@ -233,10 +240,61 @@ inline char FidoSearch::nextAlive(const char c) {
     return 0;
 }
 
+
 void FidoSearch::showStats() {
     std::cout << "\n\t--------xxxxxxxxxxxxx--------\n";
-    printf("%20s :: [%lu]\n","FILE SIZE",FILE_SIZE);
+    printf("%20s :: [%u]\n","FILE SIZE",FILE_SIZE);
     printf("%20s :: [%d]\n","PARTITION SIZE",PARTITION_SIZE);
     printf("%20s :: [%d]\n","TOTAL PARTITIONS",TOTAL_PARTITIONS);
     std::cout << "\t--------xxxxxxxxxxxxx--------\n\n";
+}
+
+
+//============================================================
+// main method
+//============================================================
+
+int main(int argc,char** argv) {
+
+    ifstream            fin;
+    const char*         arg         = NULL;
+    const char*         indexFile   = NULL;
+    const char*         search      = NULL;
+    int                 TASK        = 0;
+    int                 buffer      = 0;
+    int                 cap         = 0;
+
+    if (argc >= 5){
+        arg         = argv[1];
+        if(!strcmp(arg,"-n"))
+            TASK    = N;
+        else if(!strcmp(arg,"-r"))
+            TASK    = R;
+        else if(!strcmp(arg,"-a"))
+            TASK    = A;
+        else{
+            cout << "wrong argument\n";
+            exit(1);
+        }
+        fin.open(argv[2]);
+        indexFile   = argv[3];
+        search      = argv[4];
+        if (argc == 7) {
+            buffer  = atoi(argv[5]);
+            cap     = atoi(argv[6]);
+        }else{
+            buffer  = 8000;
+            cap     = 10000000;
+        }
+    }else{
+        cout << "Insufficient Arguments.\nUsage : bwtsearch bwt_file indx_file 'search'\n";
+        exit(1);
+    }
+
+
+    FidoSearch fido(&fin,indexFile,unsigned (buffer),unsigned (cap),TASK);
+    //fido.showStats();
+    fido.crunch(search);
+
+    return 0;
 }

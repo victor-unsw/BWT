@@ -15,6 +15,10 @@
 #include "algorithm"
 #include "pool.h"
 
+const int N     = 1;            // [-n]
+const int R     = 2;            // [-r]
+const int A     = 3;            // [-a]
+
 class FidoSearch{
 private:
     PreProcess*     indexer;                                             // indexer object; initialized only when required
@@ -24,9 +28,10 @@ private:
     bool            INDEX_EXISTS;                                        // does index exists already; thus no need to do indexing
     FBucket         globalBucket;
     FBucket         sortBucket;
+    const int       OBJECTIVE;
 
     const unsigned  MEMORY_CAP;
-    size_t          FILE_SIZE;
+    unsigned        FILE_SIZE;
     unsigned        PARTITION_SIZE;                                                             // data partition limit
     unsigned        TOTAL_PARTITIONS;                                                           // total partitions
     const char*     INDEX_FILE;
@@ -94,7 +99,7 @@ public:
     //============================================================
     // CONSTRUCTOR & DESTRUCTOR
     //============================================================
-    FidoSearch(std::ifstream* stream,const char* INDEX, const unsigned PSize, const unsigned CAP):indexer(NULL),
+    FidoSearch(std::ifstream* stream,const char* INDEX, const unsigned PSize, const unsigned CAP,int T):indexer(NULL),
                                                                                                   fin(stream),
                                                                                                   FILE_SIZE(0),
                                                                                                   PARTITION_SIZE(PSize),
@@ -102,7 +107,7 @@ public:
                                                                                                   INDEX_EXISTS(false),
                                                                                                   INDEX_FILE(INDEX),
                                                                                                   MEMORY_CAP(CAP),
-                                                                                                  pool(NULL)
+                                                                                                  pool(NULL),OBJECTIVE(T)
     {
         if (stream == NULL) {
             std::cout << "no stream found in FSearch\n";
@@ -112,7 +117,7 @@ public:
         std::streampos begin,end;
         begin       = fin->tellg();    fin->seekg(0,std::ios::end);
         end         = fin->tellg();    fin->seekg(0,std::ios::beg);
-        FILE_SIZE   = (size_t) (end-begin);
+        FILE_SIZE   = (unsigned) (end-begin);
 
         TOTAL_PARTITIONS = (unsigned)ceil(FILE_SIZE/(PARTITION_SIZE*1.0));
 
