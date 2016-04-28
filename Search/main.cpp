@@ -17,6 +17,9 @@ const string TEST= "/Users/victorchoudhary/Documents/test.txt";
 
 int main(int argc,char** argv) {
 
+
+
+
     clock_t tt = clock();
     cout << "total : " << argc << endl;
     ifstream            fin;
@@ -32,9 +35,9 @@ int main(int argc,char** argv) {
         buffer      = atoi(argv[4]);
         cap         = atoi(argv[5]);
     }else{
-        fin.open(DBLP);
-        indexFile   = "/Users/victorchoudhary/Documents/test/dblp.indx";
-        search      = "eme";
+        fin.open(LARGE);
+        indexFile   = "/Users/victorchoudhary/Documents/test/large.indx";
+        search      = "apal";
         buffer      = 4000;
         cap         = 10000000;
     }

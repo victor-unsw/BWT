@@ -183,7 +183,9 @@ void FidoSearch::crunch(const char* P) {
             count += globalBucket.freq[i];
         }
     }
+    globalBucket.show();
 
+    /*
     std::string pattern(P);
     int r = BS(pattern);
     if (r == -1)
@@ -192,7 +194,7 @@ void FidoSearch::crunch(const char* P) {
     t = clock() - t;
 
     printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
-    pool->stats();
+    pool->stats();*/
 }
 
 

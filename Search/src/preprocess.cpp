@@ -17,19 +17,20 @@ void PreProcess::index(){
 
     clock_t t = clock();
 
+    // open output stream
+    // in binary mode
     std::ofstream out(INDEX_FILE,std::ios_base::out|std::ios_base::binary);
 
     unsigned totalCount         = 0;
     unsigned partitionCount     = 0;
 
+    // start reading the file
     int c = 0;
     while ((c = fin->get()) != EOF){
-        // start reading the file
 
         if (partitionCount >= PARTITION_SIZE){
             // write the bucket data to index
-            out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
-            //globalBucket->show();
+            out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(unsigned));
             partitionCount = 0;
         }
 
@@ -37,8 +38,10 @@ void PreProcess::index(){
         partitionCount++;
         totalCount++;
     }
+    if (fin->eof())
+        fin->clear();
 
-    out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(int));
+    out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(unsigned));
 
     t = (clock()-t);
     out.close();
