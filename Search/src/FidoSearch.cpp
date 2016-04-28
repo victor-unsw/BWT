@@ -43,7 +43,6 @@ inline unsigned FidoSearch::C(const char c) {
  * - integer; i.e. total occurance of char 'c' in L[1,q].
  */
 unsigned FidoSearch::Occ(const char c, const unsigned q) {
-
     unsigned    current_partition   = (q/PARTITION_SIZE);
     int         pre_partition       = current_partition - 1;
     unsigned    frequency           = 0;
@@ -94,10 +93,9 @@ int FidoSearch::BS(const std::string P) {
 
     unsigned    FIRST   = C(c);
     unsigned    LAST    = C(n) - 1;
-
     while ((FIRST <= LAST) && loc >= 1){
         c       = P[--loc];
-        FIRST   = C(c) + Occ(c,FIRST-1);
+        FIRST   = C(c) + Occ(c,FIRST == 0 ? 0 : FIRST-1);
         LAST    = C(c) + Occ(c,LAST) - 1;
     }
 
