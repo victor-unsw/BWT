@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <set>
 
 #include "../inc/preprocess.h"
 #include "../inc/FidoSearch.h"
@@ -108,6 +109,14 @@ int FidoSearch::BS(const std::string P) {
     if (OBJECTIVE == R || OBJECTIVE == A) {
         for (unsigned i = FIRST, j = 1; i <= LAST; ++i, j++)
             decode(i);
+        if (OBJECTIVE == A){
+            for(auto it=list.begin();it!=list.end();it++)
+                cout<< *it << "\n";
+        } else{
+            cout << list.size() << endl;
+        }
+    }else{
+        cout << total_records << endl;
     }
 
     return total_records;
@@ -123,7 +132,7 @@ void FidoSearch::decode(unsigned index) {
     char c = 0;
     unsigned next = index;
 
-    std::string value;value.reserve(5000);
+    std::string value;value.reserve(100);
     bool fill = false;
     while (c != '['){
         int p = int(next/PARTITION_SIZE);                                               // partition of character we need
@@ -140,16 +149,19 @@ void FidoSearch::decode(unsigned index) {
             exit(1);
         }
         c = buffer[target];
-        value.insert(value.begin(),c);
+        if (fill)
+            value.insert(value.begin(),c);
 
         unsigned o = Occ(c,next);                               // major time con
         unsigned u = C(c);
         next = u + o - 1;
 
-        if (c == ']')
+        if (c == ']') {
+            value.insert(value.begin(),c);
             fill = true;
+        }
     }
-    //std::cout << "-> " << value << std::endl;
+    list.insert(value.c_str());
 }
 
 
@@ -197,8 +209,6 @@ void FidoSearch::crunch(const char* P) {
     if (r == -1) {
         std::cout << "WARNING [no pattern exist]\n";
         exit(1);
-    }else{
-        cout << r << endl;
     }
     t = clock() - t;
 

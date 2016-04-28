@@ -28,6 +28,7 @@ private:
     bool            INDEX_EXISTS;                                        // does index exists already; thus no need to do indexing
     FBucket         globalBucket;
     FBucket         sortBucket;
+    set<string>   list;
     const int       OBJECTIVE;
 
     const unsigned  MEMORY_CAP;
