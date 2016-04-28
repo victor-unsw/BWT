@@ -15,12 +15,11 @@
 #include "iostream"
 using namespace std;
 class Buffer{
-
 public:
     char*   b;                                      // buffer address
 
-    Buffer(int size):b(new char[size]){
-        memset((void*)b,0,size);
+    Buffer(size_t size):b(new char[size]){
+        memset((void*)b,0,size * sizeof(char));
     }
 
     ~Buffer(){
@@ -38,11 +37,11 @@ private:
     const unsigned  TOTAL_PARTITIONS;
 
     Buffer      **  pool;                                               // buffer pool ( as hashmap, load = 1)
-    uintptr_t   *   popularity;                                         // popularity of each buffer
-    std::vector<int>active;                                             // active candidates
-    int             pivot;                                              // popularity pivot
+    unsigned    *   popularity;                                         // popularity of each buffer
+    std::vector<unsigned>active;                                        // active candidates
+    unsigned        pivot;                                              // popularity pivot
 
-    unsigned        SIZE;                                               // total buffer's in pool.
+    size_t          SIZE;                                               // total buffer's in pool.
     unsigned        max_popular;                                        // max popularity
     unsigned        total_safe;                                         // total partitions returned which were already present
     unsigned        total_attempt;                                      // total partition access attempt
@@ -62,14 +61,14 @@ private:
      *
      * returns : false if any failure. else true.
      */
-    inline bool getPage(int partition);
+    inline bool getPage(unsigned partition);
 
     /*
      * releasePage(p).
      * - releases given partition buffer
      *   from the pool.
      */
-    inline void releasePage(int partition);
+    inline void releasePage(unsigned partition);
 
     /*
      * victim(p).
@@ -78,7 +77,7 @@ private:
      *
      * cp := current pivot
      */
-    inline int victim(int partition);
+    inline int victim(unsigned partition);
 
     //============================================================
     // UTILITY METHODS
@@ -90,7 +89,7 @@ private:
      *   partition is more popular.
      * - update pivot value.
      */
-    inline void updateMax(int partition);
+    inline void updateMax(unsigned partition);
 
 public:
     //============================================================
@@ -101,11 +100,11 @@ public:
      * default memory cap       := 1,00,0000 bytes a.k.a 10 MB.
      *
      */
-    BPool(std::ifstream* stream,const unsigned PSize,const unsigned TOTAL_P,const unsigned CAP):BUFFER_SIZE(PSize),
+    BPool(std::ifstream* stream,const unsigned BSize,const unsigned TOTAL_P,const unsigned CAP):BUFFER_SIZE(BSize),
                                                                                                 fin(stream),
                                                                                                 MEMORY_CAP(CAP),
                                                                                                 TOTAL_PARTITIONS(TOTAL_P),
-                                                                                                CAPACITY(CAP/PSize),
+                                                                                                CAPACITY(CAP/ BSize),
                                                                                                 pool(NULL),
                                                                                                 popularity(NULL),
                                                                                                 pivot(0),
@@ -114,15 +113,14 @@ public:
                                                                                                 total_attempt(0),
                                                                                                 total_replacement(0),
                                                                                                 SIZE(0) {
-        //cout << "building pool for " << TOTAL_PARTITIONS << " buffers\n";
         // initialize the buffer pool as null
         pool    = new Buffer*[TOTAL_PARTITIONS];
-        for (int i = 0; i < TOTAL_PARTITIONS; ++i)
+        for (size_t i = 0; i < TOTAL_PARTITIONS; ++i)
             pool[i] = NULL;
 
         // initialize popularity index as 0
-        popularity = new uintptr_t[TOTAL_PARTITIONS];
-        for (int j = 0; j < TOTAL_PARTITIONS; ++j)
+        popularity = new unsigned[TOTAL_PARTITIONS];
+        for (size_t j = 0; j < TOTAL_PARTITIONS; ++j)
             popularity[j] = 0;
 
         active.reserve(CAPACITY);
@@ -132,9 +130,10 @@ public:
     ~BPool(){
         fin = NULL;
         delete [] popularity;
-        for (int i = 0; i < TOTAL_PARTITIONS; ++i)
-            if (pool[i]!=NULL)
+        for (size_t i = 0; i < TOTAL_PARTITIONS; ++i)
+            if (pool[i] != NULL)
                 delete pool[i];
+
         delete [] pool;
     }
 
@@ -149,7 +148,7 @@ public:
      * returns : char *.
      *          - address of buffer
      */
-    const char* getBuffer(int partition);
+    const char* getBuffer(unsigned partition);
 
 
     void stats(){
@@ -162,7 +161,7 @@ public:
         printf("%20s :: [%d]\n","TOTAL ACCESS",total_access);
         printf("%20s :: [%d]\n","TOTAL REPLACEMENT",total_replacement);
         printf("%20s :: [%d]\n","TOTAL SAFE",total_safe);
-        //printf("%20s :: [%d]\n","ACTIVE",active.size());
+        printf("%20s :: [%d]\n","ACTIVE",active.size());
         std::cout << "\t--------xxxxxxBUFFERxxxxxxx--------\n\n";
     }
 

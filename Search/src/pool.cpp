@@ -18,7 +18,7 @@
  *
  * returns : false if any failure. else true.
  */
-inline bool BPool::getPage(int partition) {
+inline bool BPool::getPage(unsigned partition) {
     pool[partition]     = new Buffer(BUFFER_SIZE);
 
     int START = partition * BUFFER_SIZE;
@@ -37,8 +37,7 @@ inline bool BPool::getPage(int partition) {
  * - releases given partition buffer
  *   from the pool.
  */
-inline void BPool::releasePage(int partition) {
-    //Buffer* temp = pool[partition];
+inline void BPool::releasePage(unsigned partition) {
     delete pool[partition];
     pool[partition] = NULL;
 }
@@ -50,25 +49,20 @@ inline void BPool::releasePage(int partition) {
  *
  * - return -1 if no such index exist.
  */
-inline int BPool::victim(int p) {
-    int current = int(ceil(active.size()/2));
-    int j = current == active.size() ? 0 : current;
-    for (int i = 0; i < active.size(); ++i) {
+inline int BPool::victim(unsigned p) {
+    //unsigned current = unsigned(ceil(active.size()/2));
+    unsigned current = 0;
+    size_t j = current == active.size() ? 0 : current;
+
+    for (size_t i = 0; i < active.size(); ++i) {
         if (popularity[active[j]] < pivot){
-            int temp = active[j];active[j]  = p;
+            int temp = active[j];
+            active[j]  = p;
             return temp;
         }
-        if (j == active.size())
+        if (j >= active.size())
             j = 0;
-    }/*
-    for (auto it=active.begin();it != active.end();it++) {
-        if (popularity[*it] < pivot)
-        {
-            int temp = *it;
-            *it = p;
-            return temp;
-        }
-    }*/
+    }
     return -1;
 }
 
@@ -79,7 +73,7 @@ inline int BPool::victim(int p) {
  *
  *
  */
-const char* BPool::getBuffer(int partition) {
+const char* BPool::getBuffer(unsigned partition) {
     //cout << "getting partition : " << partition << endl;cin.get();
     total_attempt++;                                                // attempt to access a partition
     popularity[partition]++;
@@ -96,9 +90,14 @@ const char* BPool::getBuffer(int partition) {
         //cout << partition << " needs replacement \n";
 
         int nextVictim = -1;
-        while ((nextVictim = victim(partition)) == -1)
+        while ((nextVictim = victim(partition)) < 0)
             pivot += pivot;
-        releasePage(nextVictim);
+        // therefore, we are sure that nextVictim doesn't contain 8th bit set and is unsigned
+        if (nextVictim < 0){
+            cout << "victim is corrupted\n";
+            exit(1);
+        }
+        releasePage(unsigned(nextVictim));
         total_replacement++;
         SIZE--;
     } else
@@ -111,7 +110,11 @@ const char* BPool::getBuffer(int partition) {
     //cout << "sending p : " << partition << endl;
     if (pool[partition] != NULL)
         return pool[partition]->b;
-    //std::cout << "returning null\n";
+    else{
+        cout << "Buffer seems NULL\n";
+        exit(1);
+    }
+
     return NULL;
 }
 
@@ -126,8 +129,8 @@ const char* BPool::getBuffer(int partition) {
  *   partition is more popular.
  * - update pivot value.
  */
-inline void BPool::updateMax(int partition) {
+inline void BPool::updateMax(unsigned partition) {
     max_popular = popularity[partition] > max_popular ? popularity[partition] : max_popular;
     double fraction = ((max_popular*1.0)/total_attempt)*0.1;
-    pivot = int(ceil(fraction*max_popular));
+    pivot = unsigned(ceil(fraction*max_popular));
 }
