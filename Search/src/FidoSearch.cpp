@@ -37,20 +37,20 @@ inline unsigned FidoSearch::C(const char c) {
  */
 unsigned FidoSearch::Occ(const char c, const unsigned q) {
 
-    int         current_partition   = int(q/PARTITION_SIZE);
+    unsigned    current_partition   = (q/PARTITION_SIZE);
     int         pre_partition       = current_partition - 1;
     unsigned    frequency           = 0;
     FBucket     tempBucket;
 
     // fill bucket with pre partition frequencies
     if (pre_partition >= 0){
-        fillBucket(&tempBucket,pre_partition);
-        frequency = (unsigned)tempBucket.freq[c];
+        fillBucket(&tempBucket,unsigned(pre_partition));
+        frequency = tempBucket.freq[c];
     }
 
 
     // do linear frequency count over current partition
-    int         start   = int(current_partition * PARTITION_SIZE);                      // start position for read in 'bwt' file
+    unsigned    start   = current_partition * PARTITION_SIZE;                           // start position for read in 'bwt' file
 
     //std::cout << "went to pool : OCC: " << current_partition <<"\n";
     const char* buffer  = pool->getBuffer(current_partition);                           // get buffer from pool
@@ -80,10 +80,11 @@ int FidoSearch::BS(const std::string P) {
     size_t      loc     = P.size()-1;
     char        c       = P[loc];
     char        n       = nextAlive(c);                 // next character in global bucket
-    if (n == 0)
+    if (n == 0) {
+        cout << "no next character alive found: returning -1\n";
         return -1;
-    //std::cout << "c : " << char(c) << "\t :: " << sortBucket.freq[c] << std::endl;
-    //std::cout << "n : " << char(n) << "\t :: " << sortBucket.freq[n] << std::endl;cin.get();
+    }
+
     unsigned    FIRST   = C(c);
     unsigned    LAST    = C(n) - 1;
 
@@ -94,6 +95,7 @@ int FidoSearch::BS(const std::string P) {
     }
 
     if (FIRST > LAST) {
+        cout << "First > Last: returning -1\n";
         return -1;
     }
     int total_records = (LAST-FIRST+1);
@@ -101,7 +103,8 @@ int FidoSearch::BS(const std::string P) {
     printf("%10s : %u\n","[-n]",total_records);
     printf("%10s : %-5.5f sec.\n","[-n]",double(t)/CLOCKS_PER_SEC);
 
-    for (int i = FIRST,j=1; i <= LAST; ++i,j++) {
+
+    for (unsigned i = FIRST,j=1; i <= LAST; ++i,j++) {
         decode(i);
     }
     return total_records;
@@ -117,8 +120,8 @@ void FidoSearch::decode(unsigned index) {
     char c = 0;
     unsigned next = index;
 
-    //std::string value;value.reserve(5000);
-    //bool fill = false;
+    std::string value;value.reserve(5000);
+    bool fill = false;
     while (c != '['){
         int p = int(next/PARTITION_SIZE);                                               // partition of character we need
 
@@ -134,17 +137,19 @@ void FidoSearch::decode(unsigned index) {
             exit(1);
         }
         c = buffer[target];
-        //value.insert(value.begin(),c);
+        value.insert(value.begin(),c);
 
         unsigned o = Occ(c,next);                               // major time con
         unsigned u = C(c);
         next = u + o - 1;
 
-        //if (c == ']')
-        //    fill = true;
+        if (c == ']')
+            fill = true;
     }
-    //std::cout << "-> " << value << std::endl;
+    std::cout << "-> " << value << std::endl;
 }
+
+
 
 /*
  * crunch().
@@ -183,9 +188,8 @@ void FidoSearch::crunch(const char* P) {
             count += globalBucket.freq[i];
         }
     }
-    globalBucket.show();
 
-    /*
+
     std::string pattern(P);
     int r = BS(pattern);
     if (r == -1)
@@ -194,7 +198,7 @@ void FidoSearch::crunch(const char* P) {
     t = clock() - t;
 
     printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
-    pool->stats();*/
+    pool->stats();
 }
 
 
@@ -207,12 +211,12 @@ void FidoSearch::crunch(const char* P) {
  * - fills the bucket from 'Index file' according
  *   to given offset
  */
-inline void FidoSearch::fillBucket(FBucket *bucket, int partition) {
+inline void FidoSearch::fillBucket(FBucket *bucket, unsigned partition) {
     if (index.eof())
         index.clear();
 
-    index.seekg(partition*int(bucket->getSize()* sizeof(int)),std::ios_base::beg);
-    index.read((char*)bucket->freq,bucket->getSize()* sizeof(int));
+    index.seekg(partition* unsigned(bucket->getSize()* sizeof(unsigned)),std::ios_base::beg);
+    index.read((char*)bucket->freq,bucket->getSize()* sizeof(unsigned));
 }
 
 /*
@@ -228,7 +232,6 @@ inline char FidoSearch::nextAlive(const char c) {
             return char(i);
     return 0;
 }
-
 
 void FidoSearch::showStats() {
     std::cout << "\n\t--------xxxxxxxxxxxxx--------\n";

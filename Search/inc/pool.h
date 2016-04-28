@@ -154,14 +154,14 @@ public:
     void stats(){
         std::cout << "\n\t--------xxxxxxBUFFERxxxxxxx--------\n";
         printf("%20s :: [%d]\n","CAPACITY",CAPACITY);
-        printf("%20s :: [%d]\n","SIZE",SIZE);
+        printf("%20s :: [%ld]\n","SIZE",SIZE);
         printf("%20s :: [%d]\n","PIVOT",pivot);
         printf("%20s :: [%d]\n","MAX POPULAR",max_popular);
         printf("%20s :: [%d]\n","TOTAL ATTEMPTS",total_attempt);
         printf("%20s :: [%d]\n","TOTAL ACCESS",total_access);
         printf("%20s :: [%d]\n","TOTAL REPLACEMENT",total_replacement);
         printf("%20s :: [%d]\n","TOTAL SAFE",total_safe);
-        printf("%20s :: [%d]\n","ACTIVE",active.size());
+        printf("%20s :: [%ld]\n","ACTIVE",active.size());
         std::cout << "\t--------xxxxxxBUFFERxxxxxxx--------\n\n";
     }
 
