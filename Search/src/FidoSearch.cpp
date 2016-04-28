@@ -111,7 +111,7 @@ int FidoSearch::BS(const std::string P) {
             decode(i);
         if (OBJECTIVE == A){
             for(auto it=list.begin();it!=list.end();it++)
-                cout<< *it << "\n";
+                cout<<"["<< *it << "]\n";
         } else{
             cout << list.size() << endl;
         }
@@ -157,11 +157,11 @@ void FidoSearch::decode(unsigned index) {
         next = u + o - 1;
 
         if (c == ']') {
-            value.insert(value.begin(),c);
             fill = true;
         }
     }
-    list.insert(value.c_str());
+    value.erase(value.begin());
+    list.insert(atoi(value.c_str()));
 }
 
 
