@@ -15,8 +15,6 @@
  */
 void PreProcess::index(){
 
-    clock_t t = clock();
-
     // open output stream
     // in binary mode
     std::ofstream out(INDEX_FILE,std::ios_base::out|std::ios_base::binary);
@@ -43,7 +41,5 @@ void PreProcess::index(){
 
     out.write((char*)globalBucket->freq,globalBucket->getSize()*sizeof(unsigned));
 
-    t = (clock()-t);
     out.close();
-    std::cout << "[index time] \t: ";printf("%-5.3f sec.\n",double(t)/CLOCKS_PER_SEC);
 }
