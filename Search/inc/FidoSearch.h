@@ -120,6 +120,12 @@ public:
         end         = fin->tellg();    fin->seekg(0,std::ios::beg);
         FILE_SIZE   = (unsigned) (end-begin);
 
+        if (FILE_SIZE <= MEMORY_CAP){
+            PARTITION_SIZE = 1000;
+        }else if (FILE_SIZE < 50000000){
+            PARTITION_SIZE = 2000;
+        }
+
         TOTAL_PARTITIONS = (unsigned)ceil(FILE_SIZE/(PARTITION_SIZE*1.0));
 
         index.open(INDEX_FILE);
@@ -127,6 +133,7 @@ public:
 
         // create new buffer pool
         pool = new BPool(fin,PARTITION_SIZE,TOTAL_PARTITIONS,MEMORY_CAP);
+
     }
 
     ~FidoSearch(){

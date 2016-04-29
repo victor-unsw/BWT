@@ -113,6 +113,7 @@ public:
                                                                                                 total_attempt(0),
                                                                                                 total_replacement(0),
                                                                                                 SIZE(0) {
+
         // initialize the buffer pool as null
         pool    = new Buffer*[TOTAL_PARTITIONS];
         for (size_t i = 0; i < TOTAL_PARTITIONS; ++i)

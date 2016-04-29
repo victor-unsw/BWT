@@ -35,7 +35,8 @@ public:
                                                                                                                                             PARTITION_SIZE(P_SIZE),
                                                                                                                                             globalBucket(new FBucket),
                                                                                                                                             INDEX_FILE(INDEX_PATH),
-                                                                                                                                            TOTAL_PATITIONS(T_PARTITIONS){}
+                                                                                                                                            TOTAL_PATITIONS(T_PARTITIONS){
+    }
 
     /*
      * POINT input_stream to NULL;

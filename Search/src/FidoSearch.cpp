@@ -164,8 +164,6 @@ void FidoSearch::decode(unsigned index) {
     list.insert(atoi(value.c_str()));
 }
 
-
-
 /*
  * crunch().
  * - core method to search & decode
@@ -287,13 +285,8 @@ int main(int argc,char** argv) {
         fin.open(argv[2]);
         indexFile   = argv[3];
         search      = argv[4];
-        if (argc == 7) {
-            buffer  = atoi(argv[5]);
-            cap     = atoi(argv[6]);
-        }else{
-            buffer  = 8000;
-            cap     = 10000000;
-        }
+        buffer  = 4000;
+        cap     = 8000000;
     }else{
         cout << "Insufficient Arguments.\nUsage : bwtsearch bwt_file indx_file 'search'\n";
         exit(1);
@@ -301,7 +294,6 @@ int main(int argc,char** argv) {
 
 
     FidoSearch fido(&fin,indexFile,unsigned (buffer),unsigned (cap),TASK);
-    //fido.showStats();
     fido.crunch(search);
 
     return 0;
