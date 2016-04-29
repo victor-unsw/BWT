@@ -74,27 +74,23 @@ inline int BPool::victim(unsigned p) {
  *
  */
 const char* BPool::getBuffer(unsigned partition) {
-    //cout << "getting partition : " << partition << endl;cin.get();
     total_attempt++;                                                // attempt to access a partition
     popularity[partition]++;
     updateMax(partition);
 
     if (pool[partition] != NULL){
         total_safe++;
-        //cout << partition << " already there\n";
         return pool[partition]->b;
     }
 
     // if buffer doesn't exist in memory and pool is full
     if (SIZE >= CAPACITY){
-        //cout << partition << " needs replacement \n";
 
         int nextVictim = -1;
         while ((nextVictim = victim(partition)) < 0)
             pivot += pivot;
         // therefore, we are sure that nextVictim doesn't contain 8th bit set and is unsigned
         if (nextVictim < 0){
-            cout << "victim is corrupted\n";
             exit(1);
         }
         releasePage(unsigned(nextVictim));
@@ -107,7 +103,6 @@ const char* BPool::getBuffer(unsigned partition) {
     getPage(partition);
     total_access++;
     SIZE++;
-    //cout << "sending p : " << partition << endl;
     if (pool[partition] != NULL)
         return pool[partition]->b;
     else{

@@ -59,9 +59,7 @@ unsigned FidoSearch::Occ(const char c, const unsigned q) {
     // do linear frequency count over current partition
     unsigned    start   = current_partition * PARTITION_SIZE;                           // start position for read in 'bwt' file
 
-    //std::cout << "went to pool : OCC: " << current_partition <<"\n";
     const char* buffer  = pool->getBuffer(current_partition);                           // get buffer from pool
-    //std::cout << "came back from pool : OCC\n";
 
     if (buffer == NULL){
         std::cout << "no buffer received";
@@ -136,9 +134,7 @@ void FidoSearch::decode(unsigned index) {
         int PSTART = int(p * PARTITION_SIZE);
         int target = next - PSTART;
 
-        //std::cout << "went to pool : Decode : " << p <<"\n";
         const char * buffer = pool->getBuffer(p);
-        //std::cout << "came back from pool : Decode\n";
 
         if (buffer == NULL){
             std::cout << "no buffer received";
@@ -204,9 +200,6 @@ void FidoSearch::crunch(const char* P) {
         exit(1);
     }
     t = clock() - t;
-
-    //printf("%10s : %-5.5f sec.\n","[per match]",(double(t)/CLOCKS_PER_SEC)/r);
-    //pool->stats();
 }
 
 
@@ -278,11 +271,11 @@ int main(int argc,char** argv) {
             cout << "wrong argument\n";
             exit(1);
         }
-        fin.open(argv[2]);
+        fin.open(argv[2],ios::in);
         indexFile   = argv[3];
         search      = argv[4];
-        buffer  = 4000;
-        cap     = 8000000;
+        buffer  = 2000;
+        cap     = 7000000;
     }else{
         cout << "Insufficient Arguments.\nUsage : bwtsearch bwt_file indx_file 'search'\n";
         exit(1);
