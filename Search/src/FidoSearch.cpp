@@ -87,13 +87,9 @@ int FidoSearch::BS(const std::string P) {
     size_t      loc     = P.size()-1;
     char        c       = P[loc];
     char        n       = nextAlive(c);                 // next character in global bucket
-    if (n == 0) {
-        cout << "no next character alive found: returning -1\n";
-        return -1;
-    }
 
     unsigned    FIRST   = C(c);
-    unsigned    LAST    = C(n) - 1;
+    unsigned    LAST    = (int(n) == 0) ? C(c) + globalBucket.freq[c] - 1 : C(n) - 1;
     while ((FIRST <= LAST) && loc >= 1){
         c       = P[--loc];
         FIRST   = C(c) + Occ(c,FIRST == 0 ? 0 : FIRST-1);
@@ -200,7 +196,6 @@ void FidoSearch::crunch(const char* P) {
             count += globalBucket.freq[i];
         }
     }
-
 
     std::string pattern(P);
     int r = BS(pattern);
