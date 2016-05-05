@@ -1,2 +1,2 @@
 # BWT
-backward search a BWT text
+DNA Search Tool using BWT.
