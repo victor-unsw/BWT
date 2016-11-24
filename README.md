@@ -26,8 +26,11 @@ where *offset1*, *offset2*, *offset3*, etc. are integer values that are used as 
 ./bwtsearch -n [input folder] [output file] "search text"
 ```
 *input folder* : folder containing input files
+
 *output file* : file which will contain result
+
 *search text* : substring to be searched
+
 
 
 ## Features :-
